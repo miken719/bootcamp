@@ -1,11 +1,11 @@
 const express = require("express")
 const morgan = require("morgan")
 const dotenv = require("dotenv")
-const bootcamps = require("./router/bootcamps")
 dotenv.config({ path: "./config/config.env" })
+const bootcamps = require("./router/bootcamps")
 const ConnectDB = require("./config/db")
 const errorHandler = require("./middleware/errorHandler")
-
+// Connect to database
 ConnectDB()
 
 const app = express()
@@ -23,6 +23,7 @@ app.use((req, res, next) => {
   next()
 })
 const PORT = process.env.PORT
+
 const server = app.listen(
   PORT,
   console.log(`Server is running in ${process.env.NODE_ENV} port on ${PORT}`)
