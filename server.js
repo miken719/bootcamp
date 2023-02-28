@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
 const bootcamps = require("./router/bootcamps");
 const courses = require("./router/courses");
-const ConnectDB = require("./config/db");
+const ConnectDB = require("./dbConfig/db");
 const errorHandler = require("./middleware/errorHandler");
 const fileUpload = require("express-fileupload");
 // Connect to database
