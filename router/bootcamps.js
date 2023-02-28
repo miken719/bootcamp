@@ -15,7 +15,6 @@ const Bootcamp = require("../Schema/bootcampSchema");
 const courseRoutes = require("./courses");
 
 //Includes course routes
-
 router.use("/:bootcampId/courses", courseRoutes);
 //GET bootcamps in Radius
 router.route("/radius/:zipcode/:distance").get(getBootcampsInRadius);
