@@ -5,22 +5,16 @@ const bootcampSchema = require("../Schema/bootcampSchema");
 const courseSchema = require("../Schema/courseSchema");
 
 exports.getCourses = asyncHandler(async (req, res) => {
-  let query;
   if (req.params.bootcampId) {
-    query = Course.find({ bootcamp: req.params.bootcampId });
-  } else {
-    query = Course.find().populate({
-      path: "bootcamp",
-      select: "name description",
-    });
-  }
-  const courses = await query;
+    const course = await Course.find({ bootcamp: req.params.bootcampId });
+    res.status(200).json({
+      success: true,
 
-  res.status(200).json({
-    success: true,
-    count: courses.length,
-    courses: courses,
-  });
+      course: course,
+    });
+  } else {
+    res.status(200).json(res.advancedResult);
+  }
 });
 
 exports.getCoursesByID = asyncHandler(async (req, res, next) => {
