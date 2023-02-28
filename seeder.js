@@ -3,7 +3,7 @@ const fs = require("fs");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
 const Bootcamp = require("./Schema/bootcampSchema");
-
+const Courses = require("./Schema/courseSchema");
 //Connect MONGO
 mongoose.set("strictQuery", false);
 mongoose.connect(process.env.MONGO_URI, {
@@ -12,12 +12,16 @@ mongoose.connect(process.env.MONGO_URI, {
 });
 //FileSystem Read
 const bootcamps = JSON.parse(
-  fs.readFileSync(`${__dirname}/bootcamps.json`, "utf-8")
+  fs.readFileSync(`${__dirname}/_data/bootcamps.json`, "utf-8")
+);
+const courses = JSON.parse(
+  fs.readFileSync(`${__dirname}/_data/courses.json`, "utf-8")
 );
 //Import Data from JSON
 const importBootcamps = async () => {
   try {
     await Bootcamp.create(bootcamps);
+    //  await Courses.create(courses);
     console.log("Import Successfully");
     process.exit();
   } catch (err) {
@@ -28,6 +32,7 @@ const importBootcamps = async () => {
 const deleteBootcamp = async () => {
   try {
     await Bootcamp.deleteMany();
+    await Courses.deleteMany();
     console.log("Destroyed data...");
     process.exit();
   } catch (err) {
