@@ -8,7 +8,7 @@ const errorHandler = (err, req, res, next) => {
     error = new ErrorResponse(message, 404);
   }
   if (err.code === 11000) {
-    const message = "Duplicate Bootcamp Found";
+    const message = "Duplicate data found...";
     error = new ErrorResponse(message, 400);
   }
   console.log(`Error: ${error.message}`);

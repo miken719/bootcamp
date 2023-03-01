@@ -5,9 +5,12 @@ const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
 const bootcamps = require("./router/bootcamps");
 const courses = require("./router/courses");
+const register = require("./router/auth");
 const ConnectDB = require("./dbConfig/db");
 const errorHandler = require("./middleware/errorHandler");
 const fileUpload = require("express-fileupload");
+const swaggerUi = require("swagger-ui-express");
+const swaggerDocument = require("./swagger.json");
 // Connect to database
 ConnectDB();
 
@@ -28,7 +31,10 @@ app.use(express.json());
 app.use(morgan("dev"));
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
+app.use("/api/v1/auth", register);
 app.use(errorHandler);
+// let express to use this
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const PORT = process.env.PORT;
 
