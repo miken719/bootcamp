@@ -8,6 +8,7 @@ const courses = require("./router/courses");
 const register = require("./router/auth");
 const ConnectDB = require("./dbConfig/db");
 const errorHandler = require("./middleware/errorHandler");
+const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
@@ -29,6 +30,7 @@ app.use((req, res, next) => {
 app.use(fileUpload());
 app.use(express.json());
 app.use(morgan("dev"));
+app.use(cookieParser());
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
 app.use("/api/v1/auth", register);
