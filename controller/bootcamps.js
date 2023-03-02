@@ -33,7 +33,7 @@ exports.getBootcampById = asyncHandler(async (req, res, next) => {
 
 // @desc      Post All Bootcamps
 // @routes    POST /api/v1/bootcamps
-// @access    public
+// @access    Private
 exports.createBootcamp = asyncHandler(async (req, res) => {
   const bootcamp = await Bootcamp.create(req.body);
   res.status(201).json({
@@ -44,7 +44,7 @@ exports.createBootcamp = asyncHandler(async (req, res) => {
 
 // @desc      Update  Bootcamps
 // @routes    PUT /api/v1/bootcamps
-// @access    public
+// @access    Private
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const bootcamp = await Bootcamp.findByIdAndUpdate(id, req.body, {
@@ -65,7 +65,7 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 
 // @desc      Delete  Bootcamps
 // @routes    DELETE /api/v1/bootcamps
-// @access    public
+// @access    Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const bootcamp = await Bootcamp.findById(id);
@@ -107,7 +107,7 @@ exports.getBootcampsInRadius = asyncHandler(async (req, res, next) => {
 
 // @desc      Upload  Photos
 // @routes    PUT /api/v1/bootcamps
-// @access    public
+// @access    Private
 exports.uploadPhoto = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const bootcamp = await Bootcamp.findById(id);

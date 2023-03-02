@@ -4,6 +4,9 @@ const ErrorResponse = require("../middleware/error");
 const bootcampSchema = require("../Schema/bootcampSchema");
 const courseSchema = require("../Schema/courseSchema");
 
+// @desc      Get  Courses
+// @routes    GET /api/v1/courses
+// @access    Public
 exports.getCourses = asyncHandler(async (req, res) => {
   if (req.params.bootcampId) {
     const course = await Course.find({ bootcamp: req.params.bootcampId });
@@ -17,6 +20,9 @@ exports.getCourses = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc      Get  Courses By ID
+// @routes    GET /api/v1/courses
+// @access    Public
 exports.getCoursesByID = asyncHandler(async (req, res, next) => {
   const courses = await Course.findById(req.params.id).populate({
     path: "bootcamp",
@@ -34,6 +40,9 @@ exports.getCoursesByID = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc      Add  Courses
+// @routes    POST /api/v1/courses
+// @access    Private
 exports.addCourses = asyncHandler(async (req, res, next) => {
   req.body.bootcamp = req.params.bootcampId;
   const bootcamp = await bootcampSchema.findById(req.params.bootcampId);
@@ -46,6 +55,10 @@ exports.addCourses = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ status: true, data: courses });
 });
+
+// @desc      Delete  Courses
+// @routes    DELETE /api/v1/courses
+// @access    Private
 exports.deleteCourses = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
   const courses = await courseSchema.findById(id);

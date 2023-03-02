@@ -11,7 +11,7 @@ const {
   uploadPhoto,
 } = require("../controller/bootcamps");
 const advancedResult = require("../middleware/advancedResults");
-const { protect } = require("../middleware/auth");
+const { protect, manageRole } = require("../middleware/auth");
 const Bootcamp = require("../Schema/bootcampSchema");
 const courseRoutes = require("./courses");
 
@@ -30,15 +30,17 @@ router
     }),
     getBootcamps
   )
-  .post(protect, createBootcamp);
+  .post(protect, manageRole("publisher", "admin"), createBootcamp);
 
-router.route("/:id/photo").put(uploadPhoto);
+router
+  .route("/:id/photo")
+  .put(protect, manageRole("publisher", "admin"), uploadPhoto);
 
 //GET PUT DELETE ROUTES
 router
   .route("/:id")
   .get(getBootcampById)
-  .put(protect, updateBootcamp)
-  .delete(protect, deleteBootcamp);
+  .put(protect, manageRole("publisher", "admin"), updateBootcamp)
+  .delete(protect, manageRole("publisher", "admin"), deleteBootcamp);
 
 module.exports = router;

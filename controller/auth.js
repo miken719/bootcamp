@@ -1,6 +1,10 @@
 const asyncHandler = require("../middleware/asyncHandler");
 const ErrorResponse = require("../middleware/error");
 const User = require("../Schema/registerSchema");
+
+// @desc      Register New User
+// @routes    POST /api/v1/auth
+// @access    Private
 exports.register = asyncHandler(async (req, res, next) => {
   const { username, email, password, role } = req.body;
 
@@ -8,6 +12,9 @@ exports.register = asyncHandler(async (req, res, next) => {
   sendTokentoCookie(user, 200, res);
 });
 
+// @desc      Login User
+// @routes    POST /api/v1/auth
+// @access    Private
 exports.login = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
 
