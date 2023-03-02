@@ -1,9 +1,9 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "This is a simple example NodeJS API project to demonstrate Swagger Documentation",
+        "description": "This is a NodeJS API project to devCamper Swagger Documentation",
         "version": "1.0.0",
-        "title": "Tasks API",
+        "title": "Bootcamp API",
         "contact": {
             "email": "abc@gmail.com"
         },
@@ -13,7 +13,7 @@
         }
     },
     "schemes": ["http"],
-    "host": "localhost:8000",
+    "host": "https://bootcamp-node.onrender.com/",
     "basePath": "/api/v1/bootcamps",
     "paths" : {
         "/" : {
