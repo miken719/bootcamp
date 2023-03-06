@@ -12,6 +12,7 @@ const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger.json");
+
 // Connect to database
 ConnectDB();
 
@@ -27,7 +28,7 @@ app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   next();
 });
-app.use(fileUpload());
+app.use(fileUpload({ useTempFiles: true }));
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());

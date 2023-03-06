@@ -3,7 +3,14 @@ const Bootcamp = require("../Schema/bootcampSchema");
 const asyncHandler = require("../middleware/asyncHandler");
 const geocoder = require("../middleware/geoCoder");
 const ErrorResponse = require("../middleware/error");
+const cloudinary = require("cloudinary").v2;
 
+// Configuration
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 // @desc      Get All Bootcamps
 // @routes    GET /api/v1/bootcamps
 // @access    public
@@ -131,13 +138,12 @@ exports.uploadPhoto = asyncHandler(async (req, res, next) => {
     );
   }
   file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
-  file.mv(`${process.env.UPLOAD_FILE_PATH}/${file.name}`, async (err) => {
+  cloudinary.uploader.upload(file.tempFilePath, async (err, result) => {
     if (err) {
-      console.error(err);
-      new ErrorResponse(`Something went wrong...`, 500);
+      console.log("FILE_UPLOAD: ", err);
+    } else {
+      await Bootcamp.findByIdAndUpdate(req.params.id, { photo: result.url });
+      res.status(200).json({ status: true, file: file.name });
     }
-    await Bootcamp.findByIdAndUpdate(req.params.id, { photo: file.name });
-
-    res.status(200).json({ status: true, file: file.name });
   });
 });

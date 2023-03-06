@@ -26,12 +26,12 @@ exports.login = asyncHandler(async (req, res, next) => {
   // User Verify
   const user = await User.findOne({ email }).select("+password");
   if (!user) {
-    return next(new ErrorResponse("Invalid credentials", 401));
+    return next(new ErrorResponse("Invalid credentials", 404));
   }
   // Password Compare and match from database
   const isMatch = await user.matchPassword(password);
   if (!isMatch) {
-    return next(new ErrorResponse("Invalid credentials", 401));
+    return next(new ErrorResponse("Invalid credentials", 404));
   }
   sendTokentoCookie(user, 200, res);
 });
@@ -61,4 +61,24 @@ exports.getMe = asyncHandler(async (req, res, next) => {
     user,
   });
   next();
+});
+// @desc      Get All Users
+// @routes    GET /api/v1/auth
+// @access    Private
+exports.getUsers = asyncHandler(async (req, res, next) => {
+  const user = await User.find({});
+  res.status(200).json({ success: true, user });
+});
+
+// @desc      Get All Users
+// @routes    GET /api/v1/auth
+// @access    Private
+exports.deleteUser = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  console.log(id, "id");
+  const user = await User.findByIdAndDelete({ _id: id });
+  if (!user) {
+    return next(new ErrorResponse("User Not Found", 404));
+  }
+  res.status(200).json({ success: true, message: `User is deleted` });
 });

@@ -50,9 +50,10 @@ const advancedResult = (model, populate) => async (req, res, next) => {
       limit,
     };
   }
-
+  const users = await model.find({});
   res.advancedResult = {
     success: true,
+    totalrecords: users.length,
     count: result.length,
     pagination,
     result: result,
