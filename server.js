@@ -3,6 +3,7 @@ const express = require("express");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 dotenv.config({ path: "./config/config.env" });
+const cms = require("./router/cms");
 const bootcamps = require("./router/bootcamps");
 const courses = require("./router/courses");
 const register = require("./router/auth");
@@ -35,6 +36,7 @@ app.use(cookieParser());
 app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
 app.use("/api/v1/auth", register);
+app.use("/api/v1/cms", cms);
 app.use(errorHandler);
 // let express to use this
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));

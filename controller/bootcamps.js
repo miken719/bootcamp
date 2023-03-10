@@ -41,7 +41,19 @@ exports.getBootcampById = asyncHandler(async (req, res, next) => {
 // @desc      Post All Bootcamps
 // @routes    POST /api/v1/bootcamps
 // @access    Private
-exports.createBootcamp = asyncHandler(async (req, res) => {
+exports.createBootcamp = asyncHandler(async (req, res, next) => {
+  req.body.user = req.user.id;
+
+  const publishedBootcamp = await Bootcamp.findOne({ user: req.user.id });
+  //if user not an admin, they only publish one bootcamp
+  if (req.user.role !== "admin" && publishedBootcamp) {
+    return next(
+      new ErrorResponse(
+        `The user with ID ${req.user.id} has already published a bootcamp`,
+        400
+      )
+    );
+  }
   const bootcamp = await Bootcamp.create(req.body);
   res.status(201).json({
     status: true,
@@ -54,7 +66,17 @@ exports.createBootcamp = asyncHandler(async (req, res) => {
 // @access    Private
 exports.updateBootcamp = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
-  const bootcamp = await Bootcamp.findByIdAndUpdate(id, req.body, {
+  let bootcamp = await Bootcamp.findById(id);
+
+  // Only authorize use can be update bootcamp
+  if (req.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(`This ID ${id} not authorize for update bootcamp`),
+      400
+    );
+  }
+
+  bootcamp = await Bootcamp.findByIdAndUpdate(id, req.body, {
     new: true,
     runValidators: true,
   });
@@ -75,7 +97,12 @@ exports.updateBootcamp = asyncHandler(async (req, res, next) => {
 // @access    Private
 exports.deleteBootcamp = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
-  const bootcamp = await Bootcamp.findById(id);
+  let bootcamp = await Bootcamp.findById(id);
+  if (req.user.toString !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(`This ID ${id} is not authorize for delete bootcamp`)
+    );
+  }
   if (!bootcamp) {
     next(new ErrorResponse(`Something went wrong`, 404));
   } else {
@@ -137,12 +164,15 @@ exports.uploadPhoto = asyncHandler(async (req, res, next) => {
       )
     );
   }
-  file.name = `photo_${bootcamp._id}${path.parse(file.name).ext}`;
+
   cloudinary.uploader.upload(file.tempFilePath, async (err, result) => {
     if (err) {
       console.log("FILE_UPLOAD: ", err);
     } else {
-      await Bootcamp.findByIdAndUpdate(req.params.id, { photo: result.url });
+      file.name = `${result.public_id}${path.parse(file.name).ext}`;
+      await Bootcamp.findByIdAndUpdate(req.params.id, {
+        photo: `${file.name}`,
+      });
       res.status(200).json({ status: true, file: file.name });
     }
   });

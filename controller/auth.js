@@ -1,7 +1,9 @@
 const asyncHandler = require("../middleware/asyncHandler");
 const ErrorResponse = require("../middleware/error");
+const sendEmail = require("../middleware/sendEmail");
 const User = require("../Schema/registerSchema");
-
+const crypto = require("crypto");
+const emailTemplate = require("../template/email");
 // @desc      Register New User
 // @routes    POST /api/v1/auth
 // @access    Private
@@ -52,7 +54,9 @@ const sendTokentoCookie = (user, statusCode, res) => {
     .cookie("token", options, { httpOnly: true })
     .json({ success: true, token });
 };
-
+// @desc      Get Current user
+// @routes    GET /api/v1/getMe
+// @access    Private
 exports.getMe = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
 
@@ -75,10 +79,70 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
 // @access    Private
 exports.deleteUser = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
-  console.log(id, "id");
+
   const user = await User.findByIdAndDelete({ _id: id });
   if (!user) {
     return next(new ErrorResponse("User Not Found", 404));
   }
   res.status(200).json({ success: true, message: `User is deleted` });
+});
+// @desc      ForgetPassowrd Token
+// @routes    GET /api/v1/forgetpassword
+// @access    Private
+exports.forgetPassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(
+      new ErrorResponse(`User not found on this email :${req.body.email}`, 404)
+    );
+  }
+  const resetToken = await user.getResetPasswordToken();
+  await user.save({ validateBeforeSave: false });
+  const resetUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/auth/resetpassword/${resetToken}`;
+
+  const message = `Hello, ${user.username} you requested for reset password for your account here's Link to reset password ${resetUrl}`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Password Reset Token",
+      message,
+      html: emailTemplate(resetUrl),
+    });
+    res.status(200).json({ success: true, message: "Email sent" });
+  } catch (err) {
+    console.log(err);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(new ErrorResponse("Email could not sent", 500));
+  }
+});
+
+// @desc     Reset Password
+// @routes    PUT /api/v1/auth
+// @access    Private
+exports.resetPassword = asyncHandler(async (req, res, next) => {
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.resettoken)
+    .digest("hex");
+
+  const user = await User.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ErrorResponse("Invalid Token", 400));
+  }
+
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+  sendTokentoCookie(user, 200, res);
 });

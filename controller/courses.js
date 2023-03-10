@@ -45,14 +45,23 @@ exports.getCoursesByID = asyncHandler(async (req, res, next) => {
 // @access    Private
 exports.addCourses = asyncHandler(async (req, res, next) => {
   req.body.bootcamp = req.params.bootcampId;
+  req.body.user = req.user.id;
   const bootcamp = await bootcampSchema.findById(req.params.bootcampId);
+
   if (!bootcamp) {
     return next(
       new ErrorResponse(`No bootcamp found on id:- ${req.params.id}`, 404)
     );
   }
   const courses = await courseSchema.create(req.body);
-
+  if (bootcamp.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to add Bootcamp add course to bootcamp ${bootcamp._id}`,
+        400
+      )
+    );
+  }
   res.status(200).json({ status: true, data: courses });
 });
 
@@ -61,7 +70,16 @@ exports.addCourses = asyncHandler(async (req, res, next) => {
 // @access    Private
 exports.deleteCourses = asyncHandler(async (req, res, next) => {
   const id = req.params.id;
+
   const courses = await courseSchema.findById(id);
+  if (courses.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(
+        `User ${req.user.id} is not authorized to add Bootcamp  add course to bootcamp ${courses._id}`,
+        400
+      )
+    );
+  }
   if (!courses) {
     next(new ErrorResponse(`Something went wrong`, 404));
   } else {
