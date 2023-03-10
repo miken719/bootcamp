@@ -92,15 +92,11 @@ exports.deleteUser = asyncHandler(async (req, res, next) => {
 exports.forgetPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
-    return next(
-      new ErrorResponse(`User not found on this email :${req.body.email}`, 404)
-    );
+    return next(new ErrorResponse(`User not found`, 404));
   }
   const resetToken = await user.getResetPasswordToken();
   await user.save({ validateBeforeSave: false });
-  const resetUrl = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/auth/resetpassword/${resetToken}`;
+  const resetUrl = `${process.env.RESET_URL}/${resetToken}`;
 
   const message = `Hello, ${user.username} you requested for reset password for your account here's Link to reset password ${resetUrl}`;
 
@@ -111,7 +107,11 @@ exports.forgetPassword = asyncHandler(async (req, res, next) => {
       message,
       html: emailTemplate(resetUrl),
     });
-    res.status(200).json({ success: true, message: "Email sent" });
+    res.status(200).json({
+      success: true,
+      message: "Email sent on register mail id",
+      token: resetToken,
+    });
   } catch (err) {
     console.log(err);
     user.resetPasswordToken = undefined;
