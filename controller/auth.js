@@ -146,3 +146,36 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
   await user.save();
   sendTokentoCookie(user, 200, res);
 });
+// @desc      Update user details
+// @routes    PUT /api/v1/updatedetails
+// @access    Private
+exports.updateDetails = asyncHandler(async (req, res, next) => {
+
+  const fieldToUpdate = {
+    username: req.body.username,
+    email: req.body.email,
+  };
+  const user = await User.findOneAndUpdate(req.user.id, fieldToUpdate, {
+    runValidators: true,
+    new: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    user,
+  });
+  next();
+});
+
+// @desc      Update Password
+// @routes    PUT /api/v1/updatepassword
+// @access    Private
+exports.updatePassword = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+  if (!(await user.matchPassword(req.body.currentPassword))) {
+    return next(new ErrorResponse("Password Is Incorrect", 401));
+  }
+  user.password = req.body.newPassword;
+  await user.save();
+  sendTokentoCookie(user, 200, res);
+});

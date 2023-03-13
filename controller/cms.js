@@ -14,10 +14,9 @@ exports.postHomepageCms = asyncHandler(async (req, res, next) => {
   const body = req.body;
 
   const metaInfo = Cms.create(body);
-  // console.log(metaInfo);
 
   res.status(200).json({
     success: true,
-    metaInfo: body,
+    metaInfo,
   });
 });
