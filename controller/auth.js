@@ -66,13 +66,6 @@ exports.getMe = asyncHandler(async (req, res, next) => {
   });
   next();
 });
-// @desc      Get All Users
-// @routes    GET /api/v1/auth
-// @access    Private
-exports.getUsers = asyncHandler(async (req, res, next) => {
-  const user = await User.find({});
-  res.status(200).json({ success: true, user });
-});
 
 // @desc      Get All Users
 // @routes    GET /api/v1/auth
@@ -150,7 +143,6 @@ exports.resetPassword = asyncHandler(async (req, res, next) => {
 // @routes    PUT /api/v1/updatedetails
 // @access    Private
 exports.updateDetails = asyncHandler(async (req, res, next) => {
-
   const fieldToUpdate = {
     username: req.body.username,
     email: req.body.email,
@@ -173,7 +165,7 @@ exports.updateDetails = asyncHandler(async (req, res, next) => {
 exports.updatePassword = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id).select("+password");
   if (!(await user.matchPassword(req.body.currentPassword))) {
-    return next(new ErrorResponse("Password Is Incorrect", 401));
+    return next(new ErrorResponse("Password Is Incorrect", 400));
   }
   user.password = req.body.newPassword;
   await user.save();

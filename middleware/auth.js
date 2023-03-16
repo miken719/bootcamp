@@ -25,7 +25,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
   }
 });
 
-exports.manageRole = (...roles) => {
+exports.authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(

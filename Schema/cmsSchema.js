@@ -4,7 +4,7 @@ const CmsSchema = new mongoose.Schema({
   title: {
     type: String,
   },
-  descrtption: {
+  description: {
     type: String,
   },
   image: {

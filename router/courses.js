@@ -7,7 +7,7 @@ const {
   deleteCourses,
 } = require("../controller/courses");
 const advancedResult = require("../middleware/advancedResults");
-const { protect, manageRole } = require("../middleware/auth");
+const { protect, authorize } = require("../middleware/auth");
 const Course = require("../Schema/courseSchema");
 
 router
@@ -19,9 +19,9 @@ router
     }),
     getCourses
   )
-  .post(protect, manageRole("publisher", "admin"), addCourses);
+  .post(protect, authorize("publisher", "admin"), addCourses);
 router
   .route("/:id")
   .get(getCoursesByID)
-  .delete(protect, manageRole("publisher", "admin"), deleteCourses);
+  .delete(protect, authorize("publisher", "admin"), deleteCourses);
 module.exports = router;
