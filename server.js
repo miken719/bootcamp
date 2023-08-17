@@ -8,6 +8,7 @@ const bootcamps = require("./router/bootcamps");
 const courses = require("./router/courses");
 const register = require("./router/auth");
 const user = require("./router/users");
+const tweet = require("./router/tweet");
 const ConnectDB = require("./dbConfig/db");
 const errorHandler = require("./middleware/errorHandler");
 const cookieParser = require("cookie-parser");
@@ -39,6 +40,7 @@ app.use("/api/v1/bootcamps", bootcamps);
 app.use("/api/v1/courses", courses);
 app.use("/api/v1/auth", register);
 app.use("/api/v1/cms", cms);
+app.use("/", tweet);
 app.use(errorHandler);
 // let express to use this
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
